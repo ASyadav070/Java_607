@@ -1,0 +1,52 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ * Connects to a MySQL database and fetches all records from the Employee table.
+ */
+public class MySqlDataFetcher {
+
+    // --- Database Configuration ---
+    // Ensure these match your MySQL setup.
+    // The database name is 'company' as defined in your SQL script.
+    static final String DB_URL = "jdbc:mysql://localhost:3306/company";
+    static final String USER = "root"; // Common default, but please verify.
+    static final String PASS = "";     // Common default, but please verify.
+
+    public static void main(String[] args) {
+        System.out.println("Attempting to connect to the database...");
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement()) {
+
+            System.out.println("Successfully connected to the database...");
+
+            String sqlQuery = "SELECT EmpID, Name, Salary FROM Employee";
+            System.out.println("Executing query: " + sqlQuery + "\n");
+
+            try (ResultSet rs = stmt.executeQuery(sqlQuery)) {
+                System.out.println("--- Employee Records ---");
+                while (rs.next()) {
+                    // Retrieve by column name
+                    int id = rs.getInt("EmpID");
+                    String name = rs.getString("Name");
+                    double salary = rs.getDouble("Salary");
+
+                    // Display values
+                    System.out.printf("ID: %d, Name: %s, Salary: %.2f\n", id, name, salary);
+                }
+                System.out.println("------------------------");
+            }
+            System.out.println("Data fetching complete.");
+
+        } catch (SQLException e) {
+            System.err.println("Database Error: Could not connect or execute query.");
+            System.err.println("Please check your DB_URL, USER, and PASS variables.");
+            e.printStackTrace();
+        }
+    }
+}
+
